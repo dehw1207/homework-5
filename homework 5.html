@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    body {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    table {
+      border-collapse: collapse;
+    }
+
+    th, td {
+      border: 1px solid black;
+      padding: 8px;
+    }
+  </style>
+</head>
+<body>
+  <div>
+    <h2 id="current-date"></h2>
+    <label for="year-input">Year:</label>
+    <input type="number" id="year-input" min="1900" max="2100" value="2023">
+    <label for="month-input">Month:</label>
+    <input type="number" id="month-input" min="1" max="12" value="6">
+  </div>
+  <table>
+    <thead>
+      <tr>
+        <th>Sun</th>
+        <th>Mon</th>
+        <th>Tue</th>
+        <th>Wed</th>
+        <th>Thu</th>
+        <th>Fri</th>
+        <th>Sat</th>
+      </tr>
+    </thead>
+    <tbody id="calendar-body"></tbody>
+  </table>
+
+  <script>
+    var calendarBody = document.getElementById('calendar-body');
+    var currentDateElement = document.getElementById('current-date');
+    var yearInput = document.getElementById('year-input');
+    var monthInput = document.getElementById('month-input');
+
+    // 초기 실행
+    updateCalendar();
+
+    function updateCalendar() {
+      var year = parseInt(yearInput.value);
+      var month = parseInt(monthInput.value) - 1; // JavaScript에서 월은 0부터 시작하므로 1을 뺍니다.
+
+      // 월을 1월보다 작게 조정
+      while (month < 0) {
+        month = 11;
+        year--;
+      }
+
+      // 월을 12월보다 크게 조정
+      while (month > 11) {
+        month = 0;
+        year++;
+      }
+
+      // 날짜 객체 생성
+      var currentDate = new Date(year, month);
+      var currentYear = currentDate.getFullYear();
+      var currentMonth = currentDate.getMonth();
+
+      // 현재 월의 첫째 날의 요일 가져오기
+      var firstDay = new Date(currentYear, currentMonth, 1).getDay();
+
+      // 현재 월의 마지막 날 가져오기
+      var lastDay = new Date(currentYear, currentMonth + 1, 0).getDate();
+
+      // 달력 초기화
+      calendarBody.innerHTML = '';
+
+      var date = 1;
+
+      // 달력 행과 열 생성
+      for (var i = 0; i < 6; i++) {
+        var row = document.createElement('tr');
+
+        for (var j = 0; j < 7; j++) {
+          if (i === 0 && j < firstDay) {
+            // 첫 번째 행에서 현재 월의 시작 요일 전까지의 공백 셀 생성
+            var cell = document.createElement('td');
+            var cellText = document.createTextNode('');
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+          } else if (date > lastDay) {
+            // 마지막 날 이후의 공백 셀 생성
+            break;
+          } else {
+            // 날짜가 표시되는 셀 생성
+            var cell = document.createElement('td');
+            var cellText = document.createTextNode(date);
+            cell.appendChild(cellText);
+            row.appendChild(cell);
+            date++;
+          }
+        }
+
+        calendarBody.appendChild(row);
+      }
+
+      // 현재 시간 표시
+      var currentTime = new Date();
+      var currentHour = currentTime.getHours().toString().padStart(2, '0'); // 시간을 2자리로 표시하고, 한 자리일 경우 앞에 0을 추가
+      var currentMinute = currentTime.getMinutes().toString().padStart(2, '0'); // 분을 2자리로 표시하고, 한 자리일 경우 앞에 0을 추가
+      var currentSecond = currentTime.getSeconds().toString().padStart(2, '0'); // 초를 2자리로 표시하고, 한 자리일 경우 앞에 0을 추가
+
+      // 현재 날짜와 시간 표시
+      currentDateElement.innerHTML = 'Year: ' + currentYear + ' | Month: ' + (currentMonth + 1) + ' | Time: ' + currentHour + ':' + currentMinute + ':' + currentSecond;
+
+      // 1초마다 현재 시간 업데이트
+      setTimeout(updateCalendar, 1000);
+    }
+  </script>
+</body>
+</html>
